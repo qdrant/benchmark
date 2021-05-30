@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  qdrant_bench:
+    image: generall/qdrant:latest
+    volumes:
+      - ./data/storage:/qdrant/storage
+      - ./config/config.yaml:/qdrant/config/production.yaml
+
+    network_mode: host

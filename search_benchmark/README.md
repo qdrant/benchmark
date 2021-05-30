@@ -1,0 +1,3 @@
+
+# Qdrant search speed benchmark
+
