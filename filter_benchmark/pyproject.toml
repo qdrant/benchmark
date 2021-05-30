@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "cd ../"
+version = "0.1.0"
+description = ""
+authors = ["Andrey Vasnetsov <andrey@vasnetsov.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pymilvus = "^0.3.0"
+numpy = "^1.19.4"
+scipy = "^1.6.0"
+scikit-learn = "^0.24.0"
+tqdm = "^4.55.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

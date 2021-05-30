@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  milvus:
+    image: milvusdb/milvus:0.11.0-cpu-d101620-4c44c0
+    ports:
+      - 19530:19530
+      - 19121:19121
