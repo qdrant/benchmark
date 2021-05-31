@@ -1,0 +1,2 @@
+h5py
+git+https://github.com/qdrant/qdrant_client.git@master#egg=qdrant_client
