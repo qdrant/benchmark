@@ -7,7 +7,7 @@ from qdrant_client import QdrantClient
 from qdrant_openapi_client.models.models import Distance, CollectionStatus, StorageOperationsAnyOf1, \
     StorageOperationsAnyOf1UpdateCollection, OptimizersConfigDiff
 
-from search_benchmark.benchmark.config import DATA_DIR
+from benchmark.config import DATA_DIR
 
 
 class Benchmark:
@@ -42,7 +42,7 @@ class Benchmark:
         )
 
     def wait_collection_green(self):
-        wait_time = 2.0
+        wait_time = 10.0
         total = 0
         collection_info = self.client.openapi_client.collections_api.get_collection(self.collection_name)
         while collection_info.result.status != CollectionStatus.GREEN:
@@ -57,7 +57,8 @@ class Benchmark:
             StorageOperationsAnyOf1(update_collection=StorageOperationsAnyOf1UpdateCollection(
                 name=self.collection_name,
                 optimizers_config=OptimizersConfigDiff(
-                    indexing_threshold=10000
+                    indexing_threshold=10000,
+                    max_segment_number=6
                 )
             ))
         )
@@ -72,10 +73,10 @@ if __name__ == '__main__':
 
     time.sleep(0.5)
 
-    # pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
-    #
-    # wait_for_index_time = benchmark.wait_collection_green()
-    # print("Waited for index: ", wait_for_index_time)
-    #
-    # pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
+    pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
+
+    wait_for_index_time = benchmark.wait_collection_green()
+    print("Waited for index: ", wait_for_index_time)
+
+    pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
 
