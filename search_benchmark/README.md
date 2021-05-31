@@ -11,6 +11,13 @@ GloVe Angular 100: http://ann-benchmarks.com/glove-100-angular.hdf5
 
 ## Usage
 
+
+Download data
+
+```bash
+bash get_data.sh
+```
+
 Install dependencies
 
 ```bash
@@ -30,7 +37,7 @@ python -m benchmark.upload_data
 ```
 Uploaded data available for search immediately, but building of HNSW index may take quite some time. 
 
-Running search benchmark
+Run search benchmark
 
 ```bash
 python -m benchmark.search
