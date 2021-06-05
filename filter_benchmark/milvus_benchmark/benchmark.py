@@ -3,6 +3,7 @@ import os
 from collections import defaultdict
 from pprint import pprint
 
+import math
 import numpy as np
 from milvus import Milvus, DataType
 from tqdm import tqdm
@@ -54,19 +55,30 @@ class MilvusBenchmark:
         })
 
         ids = []
-        entities = defaultdict(list)
+        
         embeddings = []
-        for idx, (vector, payload) in enumerate(zip(vectors, payloads)):
+        for idx, vector in enumerate(vectors):
             ids.append(idx)
-            for key, val in payload.items():
-                entities[key].append(val)
-
             embeddings.append(vector.tolist())
 
-        hybrid_entities = [
+        print("Inserting .... ")
+        batch_size = 10_000
+        num_batches = math.ceil(len(embeddings) / batch_size)
+        for batch_id in tqdm(range(num_batches)):
+            
+            payloads_batch = payloads[batch_id * batch_size:(batch_id + 1) * batch_size]
+            embeddings_batch = embeddings[batch_id * batch_size:(batch_id + 1) * batch_size]
+            ids_batch = ids[batch_id * batch_size:(batch_id + 1) * batch_size]
+            
+            entities = defaultdict(list)
+            for payload_item in payloads_batch:
+                for key, val in payload_item.items():
+                    entities[key].append(val)
+
+            hybrid_entities_batch = [
                               {
                                   "name": "embedding",
-                                  "values": embeddings,
+                                  "values": embeddings_batch,
                                   "type": DataType.FLOAT_VECTOR
                               }
                           ] + [
@@ -77,14 +89,14 @@ class MilvusBenchmark:
                               } for key, vals in entities.items()
                           ]
 
-        print("Inserting .... ")
-        self.client.insert(self.collection_name, hybrid_entities, ids)
+            self.client.insert(self.collection_name, hybrid_entities_batch, ids_batch)
+
 
     def query(self, path):
         info = self.client.get_collection_info(self.collection_name)
         stats = self.client.get_collection_stats(self.collection_name)
-        # pprint(info)
-        # pprint(stats)
+        pprint(info)
+        pprint(stats)
         queries = []
         with open(path + '.queries.jsonl', 'r') as fd:
             for line in fd:
@@ -124,9 +136,3 @@ class MilvusBenchmark:
             expected_hits += len(query['result'])
         print("hit_rate", total_hits / expected_hits)
 
-
-if __name__ == '__main__':
-    bench_path = os.path.join(DATA_DIR, "bench-02")
-    benchmark = MilvusBenchmark()
-    # benchmark.upload_data(bench_path)
-    benchmark.query(bench_path)

@@ -80,14 +80,26 @@ class SampleGenerator:
                 out.write('\n')
 
         with open(path + '.queries.jsonl', 'w') as out:
-            for _ in tqdm(range(num_queries)):
-                out.write(json.dumps(self.generate_query(payload_keys)))
-                out.write('\n')
+            for payload_key in payload_keys:
+                for _ in tqdm(range(num_queries)):
+                    out.write(json.dumps(self.generate_query({payload_key})))
+                    out.write('\n')
 
 
 if __name__ == '__main__':
-    num_vectors = 1_000_000
-    dim = 4
-    payload_params = {'a': 2, 'b': 4, 'c': 8, 'e': 16, 'f': 32, 'g': 64}
+    import string
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--num-vectors", default=1_000_000, type=int, help="number of vectors to generate")
+    parser.add_argument("-d", "--dim", default=16, type=int, help="vector dimensions")
+    parser.add_argument("-p", "--parts", action='append', type=int, required=True, help="payload fractions")
+    parser.add_argument("-f", "--file-name", default='bench-01', help="name of the output benchmark data")
+    parser.add_argument("-q", "--num-queries", default=1000, type=int, help="how many queries prepare for benchmark")
+
+    args = parser.parse_args()
+
+    num_vectors = args.num_vectors
+    dim = args.dim
+    payload_params = dict(zip(string.ascii_lowercase, args.parts))
     sampler = SampleGenerator(num_vectors, dim, payload_params=payload_params)
-    sampler.generate(os.path.join(DATA_DIR, "bench-02"), num_queries=100, payload_keys={'g'})
+    sampler.generate(os.path.join(DATA_DIR, args.file_name), num_queries=args.num_queries, payload_keys=set(payload_params.keys()))
