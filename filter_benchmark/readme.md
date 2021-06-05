@@ -1,11 +1,11 @@
 # Filtrable search benchmark
 
+Testing the completeness of search results when using filters.
+Using filters in conjunction with the HNSW graph without any additional measures leads to loss of results due to loss of graph connectivity.
+More information here: https://blog.vasnetsov.com/posts/categorical-hnsw/
+
 
 ## Example Usage
-
-
-Create sample data collection (numpy).
-10 million vectors with dim=16 (default) + payload of 200 different values.
 
 
 Install dependencies
@@ -13,6 +13,9 @@ Install dependencies
 pip install poetry
 poetry install
 ```
+
+Create sample data collection (numpy).
+10 million vectors with dim=16 (default) + payload of 200 different values.
 
 ```
 python -m sample_generator.generator -n 10000000 -p 200 -q 100
