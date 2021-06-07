@@ -47,8 +47,9 @@ python -m benchmark.search
 
 ## Example Results
 
-Qdrant params:
+[Qdrant](https://github.com/qdrant/qdrant) params:
 
+* Version: v0.3.0
 * Num parallel searchers: 4
 
 For GloVe Angular 100 dataset: 
