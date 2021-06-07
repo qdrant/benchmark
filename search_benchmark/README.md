@@ -35,6 +35,7 @@ Upload search data
 ```bash
 python -m benchmark.upload_data
 ```
+
 Uploaded data available for search immediately, but building of HNSW index may take quite some time. 
 
 Run search benchmark
@@ -49,7 +50,6 @@ python -m benchmark.search
 Qdrant params:
 
 * Num parallel searchers: 4
-* Num parallel queries: 4
 
 For GloVe Angular 100 dataset: 
 
@@ -64,7 +64,18 @@ Used HNSW index params:
 * `ef = 100`
 
 ```
-avg precision = 0.96
-total time = 52.42 sec
-time per query = 0.0052 sec
+Search with 1 threads
+avg precision = 0.876
+total time = 94.418 sec
+time per query = 0.0094 sec
+query latency = 0.0034 sec
+```
+
+
+```
+Search with 4 threads
+avg precision = 0.876
+total time = 28.030 sec
+time per query = 0.0028 sec
+query latency = 0.0087 sec
 ```
