@@ -29,8 +29,10 @@ python -m benchmark.generate_data -n 1000000 -d 64 -q 1000
 Run Qdrant instance with 500 Mb ram limit:
 
 ```bash
-sudo bash -c 'sync; echo 1 > /proc/sys/vm/drop_caches' # Ensure that there is no data in page cache before each benchmark run
+# Ensure that there is no data in page cache before each benchmark run
+sudo bash -c 'sync; echo 1 > /proc/sys/vm/drop_caches' 
 
+# Run with docker memory limit
 RAM_LIMIT=500 bash -x run-docker.sh
 ```
 
@@ -70,17 +72,18 @@ Used HNSW index params:
 
 **Plain index in-memory**
 
+* RAM Usage: 565Mb
+
 ```
 total time = 14.746 sec
 time per query = 0.0147 sec
 query latency = 0.0588 sec
 ```
 
-<!-- RAM usage: 565Mb -->
-
 **Plain index mmap**
 
-* Start RAM Usage: 243Mb
+* Minimal RAM Usage: 243Mb
+* Full page cache RAM usage: 464Mb
 
 ```
 total time = 16.438 sec
@@ -88,42 +91,26 @@ time per query = 0.0164 sec
 query latency = 0.0656 sec
 ```
 
-<!-- Mem usage: 243Mb, after search - 464Mb -->
-
 **HNSW index with mmap**
 
+Disk usage:
+
+* Vectors size: 246M
+* Vector index: 123M
+
+RAM usage:
+
 * Start RAM usage: 418Mb
-* Full RAM usage without mmap: 677Mb
+* Full RAM without restrictions: 677Mb
 
 
-Benchmark with RAM Limit 450Mb (12% full vector size)
+|mem allowed, Mb|time per query|query latency|
+|---------------|--------------|-------------|
+|400            |0.1018        |0.4066       |
+|450            |0.0991        |0.3958       |
+|500            |0.0965        |0.3854       |
+|550            |0.0558        |0.2228       |
+|575            |0.0118        |0.0471       |
+|600            |0.002         |0.008        |
+|1000           |0.0019        |0.0077       |
 
-```
-total time = 99.117 sec
-time per query = 0.0991 sec
-query latency = 0.3958 sec
-```
-
-Benchmark with RAM Limit 500Mb (31% full vector size)
-
-```
-total time = 96.518 sec
-time per query = 0.0965 sec
-query latency = 0.3854 sec
-```
-
-Benchmark with RAM Limit 550Mb (50% full vector size)
-
-```
-total time = 55.811 sec
-time per query = 0.0558 sec
-query latency = 0.2228 sec
-```
-
-Benchmark with RAM limit 600Mb (71% full vector size)
-
-```
-total time = 1.932 sec
-time per query = 0.0019 sec
-query latency = 0.0077 sec
-```
