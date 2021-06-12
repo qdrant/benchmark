@@ -18,7 +18,7 @@ if __name__ == '__main__':
     bench_path = os.path.join(DATA_DIR, args.file_name)
 
     benchmark = BenchmarkUpload()
-    benchmark.upload_data(path=bench_path, parallel=4)
+    # benchmark.upload_data(path=bench_path, parallel=4)
     benchmark.wait_collection_green()
     benchmark.enable_mmap_and_index()
 

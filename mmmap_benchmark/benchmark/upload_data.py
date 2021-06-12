@@ -4,6 +4,7 @@ import time
 from pprint import pprint
 
 import h5py
+import httpx
 import numpy as np
 from qdrant_client import QdrantClient
 from qdrant_openapi_client.models.models import Distance, CollectionStatus, StorageOperationsAnyOf1, \
@@ -16,7 +17,7 @@ class BenchmarkUpload:
 
     def __init__(self, collection_name="benchmark_collection"):
         self.collection_name = collection_name
-        self.client = QdrantClient()
+        self.client = QdrantClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
 
     def upload_data(self, path, parallel=4):
 

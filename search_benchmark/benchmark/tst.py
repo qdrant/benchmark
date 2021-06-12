@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     client = QdrantClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
 
-    for i in range(150):
+    for i in range(20):
 
         start = time.time()
 
@@ -45,5 +45,5 @@ if __name__ == '__main__':
 
         end = time.time()
 
-        print((end - start) * 1000)
-        # print(f"{res.time * 1000:.2f}, {(end - start) * 1000:.2f}")
+        # print((end - start) * 1000)
+        print(f"{res.time * 1000:.2f}, {(end - start) * 1000:.2f}")

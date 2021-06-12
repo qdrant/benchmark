@@ -2,8 +2,8 @@ import os
 import time
 import json
 from concurrent import futures
+import httpx
 
-import h5py
 from qdrant_client import QdrantClient
 
 from benchmark.config import DATA_DIR
@@ -13,7 +13,7 @@ class BenchmarkSearch:
 
     def __init__(self, collection_name="benchmark_collection"):
         self.collection_name = collection_name
-        self.client = QdrantClient()
+        self.client = QdrantClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
 
     def search_one(self, query):
         true_result = set(res[0] for res in query['result'])
