@@ -39,7 +39,13 @@ RAM_LIMIT=500 bash -x run-docker.sh
 Upload search data
 
 ```bash
-python -m benchmark.upload_data
+python -m benchmark.make_plain_collection # Upload and make in-memory collection
+# or
+python -m benchmark.make_plain_indexed_collection # Upload and make in-memory collection with HNSW index
+# or
+python -m benchmark.make_mmap_collection # Upload and make mmap-ed collection
+# or
+python -m benchmark.make_mmap_index_collection # Upload and make mmap-ed collection with HNSW index
 ```
 Uploaded data available for search immediately, but building of HNSW index may take quite some time. 
 
