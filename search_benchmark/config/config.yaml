@@ -1,5 +1,5 @@
 debug: false
-log_level: DEBUG
+log_level: INFO
 
 storage:
   # Where to store all the data

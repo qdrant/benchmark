@@ -76,8 +76,8 @@ class BenchmarkUpload:
 
     def enable_index(self):
         return self.alter_config(OptimizersConfigDiff(
-            indexing_threshold=10000,
-            payload_indexing_threshold=10000,
+            indexing_threshold=10000000,
+            payload_indexing_threshold=100000000,
             max_segment_number=6
         ))
 
