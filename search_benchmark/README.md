@@ -21,7 +21,7 @@ bash get_data.sh
 Install dependencies
 
 ```bash
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 Run Qdrant instance
