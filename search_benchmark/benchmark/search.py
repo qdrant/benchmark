@@ -53,7 +53,6 @@ class BenchmarkSearch:
         precisions, latencies = list(zip(*future_results))
         end = time.time()
 
-        
         print(f"avg precision = {sum(precisions) / len(precisions):.3f}")
         print(f"total time = {end - start:.3f} sec")
         print(f"time per query = {(end - start) / num_queries:.4f} sec")

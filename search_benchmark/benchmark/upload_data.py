@@ -4,8 +4,7 @@ from pprint import pprint
 
 import h5py
 from qdrant_client import QdrantClient
-from qdrant_openapi_client.models.models import Distance, CollectionStatus, StorageOperationsAnyOf1, \
-    StorageOperationsAnyOf1UpdateCollection, OptimizersConfigDiff
+from qdrant_openapi_client.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection
 
 from benchmark.config import DATA_DIR
 
@@ -53,21 +52,23 @@ class Benchmark:
 
     def enable_indexing(self):
 
-        self.client.openapi_client.collections_api.update_collections(
-            StorageOperationsAnyOf1(update_collection=StorageOperationsAnyOf1UpdateCollection(
-                name=self.collection_name,
+        time.sleep(20)
+
+        self.client.http.collections_api.update_collection(
+            name=self.collection_name,
+            update_collection=UpdateCollection(
                 optimizers_config=OptimizersConfigDiff(
                     indexing_threshold=10000,
                     max_segment_number=6
                 )
-            ))
+            )
         )
 
 
 if __name__ == '__main__':
 
     benchmark = Benchmark()
-    benchmark.upload_data(parallel=4)
+    benchmark.upload_data(parallel=8)
     benchmark.wait_collection_green()
     benchmark.enable_indexing()
 
