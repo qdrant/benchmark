@@ -45,7 +45,7 @@ python -m benchmark.make_plain_indexed_collection # Upload and make in-memory co
 # or
 python -m benchmark.make_mmap_collection # Upload and make mmap-ed collection
 # or
-python -m benchmark.make_mmap_index_collection # Upload and make mmap-ed collection with HNSW index
+python -m benchmark.make_mmap_indexed_collection # Upload and make mmap-ed collection with HNSW index
 ```
 Uploaded data available for search immediately, but building of HNSW index may take quite some time. 
 

@@ -3,12 +3,10 @@ import os
 import time
 from pprint import pprint
 
-import h5py
 import httpx
 import numpy as np
 from qdrant_client import QdrantClient
-from qdrant_openapi_client.models.models import Distance, CollectionStatus, StorageOperationsAnyOf1, \
-    StorageOperationsAnyOf1UpdateCollection, OptimizersConfigDiff
+from qdrant_client.http.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection
 
 from benchmark.config import DATA_DIR
 
@@ -17,7 +15,7 @@ class BenchmarkUpload:
 
     def __init__(self, collection_name="benchmark_collection"):
         self.collection_name = collection_name
-        self.client = QdrantClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
+        self.client = QdrantClient(prefer_grpc=True, limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
 
     def upload_data(self, path, parallel=4):
 
@@ -65,11 +63,9 @@ class BenchmarkUpload:
         return total
 
     def alter_config(self, diff: OptimizersConfigDiff):
-        return self.client.openapi_client.collections_api.update_collections(
-            StorageOperationsAnyOf1(update_collection=StorageOperationsAnyOf1UpdateCollection(
-                name=self.collection_name,
-                optimizers_config=diff
-            ))
+        return self.client.openapi_client.collections_api.update_collection(
+            collection_name=self.collection_name,
+            update_collection=UpdateCollection(optimizers_config=diff)
         )
 
     def enable_index(self):

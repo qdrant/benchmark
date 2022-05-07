@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import normalize
 from tqdm import tqdm
 
-from benchmark.settings import DATA_DIR
+from .settings import DATA_DIR
 
 
 class SampleGenerator:

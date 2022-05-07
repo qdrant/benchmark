@@ -6,8 +6,8 @@ from pprint import pprint
 import httpx
 import numpy as np
 from qdrant_client import QdrantClient
-from qdrant_openapi_client.models.models import Distance, CollectionStatus, StorageOperationsAnyOf1, \
-    StorageOperationsAnyOf1UpdateCollection, OptimizersConfigDiff
+from qdrant_client.http.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection, \
+    PayloadSchemaType
 
 from benchmark.config import DATA_DIR
 
@@ -64,15 +64,17 @@ class BenchmarkUpload:
         return total
 
     def alter_config(self, diff: OptimizersConfigDiff):
-        return self.client.openapi_client.collections_api.update_collections(
-            StorageOperationsAnyOf1(update_collection=StorageOperationsAnyOf1UpdateCollection(
-                name=self.collection_name,
-                optimizers_config=diff
-            ))
+        return self.client.openapi_client.collections_api.update_collection(
+            collection_name=self.collection_name,
+            update_collection=UpdateCollection(optimizers_config=diff)
         )
 
     def set_indexed_field(self, field_name):
-        self.client.create_payload_index(collection_name=self.collection_name, field_name=field_name)
+        self.client.create_payload_index(
+            collection_name=self.collection_name,
+            field_name=field_name,
+            field_type=PayloadSchemaType.INTEGER
+        )
 
     def enable_index(self):
         return self.alter_config(OptimizersConfigDiff(
