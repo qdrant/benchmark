@@ -1,10 +1,10 @@
 
 from pprint import pprint
 import time
-from benchmark.settings import DATA_DIR
+from .settings import DATA_DIR
 
 import os
-from benchmark.upload_data import BenchmarkUpload
+from .upload_data import BenchmarkUpload
 
 
 if __name__ == '__main__':

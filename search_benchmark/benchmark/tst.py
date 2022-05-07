@@ -1,21 +1,17 @@
 import os
 import time
-from concurrent import futures
-import requests
-import httpx
 
 import h5py
+import httpx
 from qdrant_client import QdrantClient
 from qdrant_openapi_client.models.models import SearchRequest
 
 from benchmark.config import DATA_DIR
 
-
 if __name__ == '__main__':
 
     vectors_path = os.path.join(DATA_DIR, 'glove-100-angular.hdf5')
     data = h5py.File(vectors_path)
-    
 
     collection_name = "benchmark_collection"
 

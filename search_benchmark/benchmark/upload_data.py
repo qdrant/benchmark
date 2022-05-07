@@ -4,7 +4,7 @@ from pprint import pprint
 
 import h5py
 from qdrant_client import QdrantClient
-from qdrant_openapi_client.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection
+from qdrant_client.http.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection
 
 from benchmark.config import DATA_DIR
 
@@ -15,7 +15,7 @@ class Benchmark:
         self.collection_name = collection_name
         vectors_path = os.path.join(DATA_DIR, 'glove-100-angular.hdf5')
         self.data = h5py.File(vectors_path)
-        self.client = QdrantClient()
+        self.client = QdrantClient(prefer_grpc=True)
         self.vector_size = len(self.data['train'][0])
 
     def upload_data(self, parallel=4):
@@ -28,7 +28,6 @@ class Benchmark:
                 indexing_threshold=1000000000,  # Disable indexing before all points are added
                 memmap_threshold=1000000000,
                 payload_indexing_threshold=1000000000,
-                max_segment_number=4
             )
         )
 
@@ -52,14 +51,13 @@ class Benchmark:
 
     def enable_indexing(self):
 
-        time.sleep(20)
+        time.sleep(10)
 
         self.client.http.collections_api.update_collection(
-            name=self.collection_name,
+            collection_name=self.collection_name,
             update_collection=UpdateCollection(
                 optimizers_config=OptimizersConfigDiff(
                     indexing_threshold=10000,
-                    max_segment_number=6
                 )
             )
         )
