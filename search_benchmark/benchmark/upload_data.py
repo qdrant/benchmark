@@ -1,6 +1,5 @@
 import os
 import time
-from pprint import pprint
 
 import h5py
 from qdrant_client import QdrantClient
@@ -11,10 +10,9 @@ from benchmark.config import DATA_DIR
 
 class Benchmark:
 
-    def __init__(self, collection_name="benchmark_collection"):
+    def __init__(self, data, collection_name="benchmark_collection"):
         self.collection_name = collection_name
-        vectors_path = os.path.join(DATA_DIR, 'glove-100-angular.hdf5')
-        self.data = h5py.File(vectors_path)
+        self.data = data
         self.client = QdrantClient(prefer_grpc=True)
         self.vector_size = len(self.data['train'][0])
 
@@ -25,7 +23,7 @@ class Benchmark:
             distance=Distance.COSINE,
             optimizers_config=OptimizersConfigDiff(
                 flush_interval_sec=10,
-                indexing_threshold=1000000000,  # Disable indexing before all points are added
+                indexing_threshold=10000000,  # For better speed: Disable indexing before all points are added
                 memmap_threshold=1000000000,
                 payload_indexing_threshold=1000000000,
             )
@@ -40,7 +38,7 @@ class Benchmark:
         )
 
     def wait_collection_green(self):
-        wait_time = 10.0
+        wait_time = 1.0
         total = 0
         collection_info = self.client.openapi_client.collections_api.get_collection(self.collection_name)
         while collection_info.result.status != CollectionStatus.GREEN:
@@ -50,9 +48,6 @@ class Benchmark:
         return total
 
     def enable_indexing(self):
-
-        time.sleep(10)
-
         self.client.http.collections_api.update_collection(
             collection_name=self.collection_name,
             update_collection=UpdateCollection(
@@ -64,18 +59,29 @@ class Benchmark:
 
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--parallel", default=4, type=int, help="number of threads for requests")
 
-    benchmark = Benchmark()
-    benchmark.upload_data(parallel=8)
+    args = parser.parse_args()
+
+    vectors_path = os.path.join(DATA_DIR, 'glove-100-angular.hdf5')
+    data = h5py.File(vectors_path)
+
+    start = time.monotonic()
+    benchmark = Benchmark(data)
+    benchmark.upload_data(parallel=args.parallel)
     benchmark.wait_collection_green()
+    end_upload = time.monotonic()
+
+    print("Data uploaded: ", end_upload - start)
     benchmark.enable_indexing()
-
     time.sleep(0.5)
-
-    pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
+    # pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
 
     wait_for_index_time = benchmark.wait_collection_green()
-    print("Waited for index: ", wait_for_index_time)
+    end_indexing = time.monotonic()
+    print("Index created: ", end_indexing - start)
 
-    pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
+    # pprint(benchmark.client.openapi_client.collections_api.get_collection(benchmark.collection_name).dict())
 

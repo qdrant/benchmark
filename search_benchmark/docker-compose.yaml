@@ -3,6 +3,10 @@ version: '3.7'
 services:
   qdrant_bench:
     image: qdrant/qdrant:v0.7.0
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 1200Mb
     volumes:
       - ./data/storage:/qdrant/storage
       - ./config/config.yaml:/qdrant/config/production.yaml
