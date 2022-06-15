@@ -6,7 +6,7 @@ import httpx
 
 from qdrant_client import QdrantClient
 from qdrant_openapi_client.models.models import FieldCondition, Filter, Match
-
+from qdrant_client.http.models import MatchValue
 from benchmark.config import DATA_DIR
 
 
@@ -21,7 +21,7 @@ class BenchmarkSearch:
         top = len(true_result)
         if query['payload']:
             must_clauses = [
-                FieldCondition(key=key, match=Match(integer=value)) 
+                FieldCondition(key=key,match=MatchValue(value=value))
                 for key, value in query['payload'].items()
             ]
             query_filter = Filter(must=must_clauses)
