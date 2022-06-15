@@ -17,7 +17,10 @@ class Querier:
     @classmethod
     def init_client(cls, collection_name="benchmark_collection"):
         cls.collection_name = collection_name
-        cls.client = QdrantClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
+        cls.client = QdrantClient(
+            prefer_grpc=True,
+            limits=httpx.Limits(max_connections=None, max_keepalive_connections=0),
+        )
 
     @classmethod
     def search_one(cls, params):
@@ -29,7 +32,7 @@ class Querier:
             collection_name=cls.collection_name,
             query_vector=vector,
             top=top,
-            append_payload=False
+            with_payload=False
         )
         end = time.monotonic()
         search_res = set(x.id for x in res)
@@ -42,7 +45,10 @@ class BenchmarkSearch:
     def __init__(self, data, collection_name="benchmark_collection"):
         self.collection_name = collection_name
         self.data = data
-        self.client = QdrantClient(limits=httpx.Limits(max_connections=None, max_keepalive_connections=0))
+        self.client = QdrantClient(
+            prefer_grpc=True,
+            limits=httpx.Limits(max_connections=None, max_keepalive_connections=0)
+        )
         self.vector_size = len(self.data['test'][0])
 
     def search_one(self, i):
@@ -53,7 +59,7 @@ class BenchmarkSearch:
             self.collection_name,
             query_vector=self.data['test'][i],
             top=top,
-            append_payload=False
+            with_payload=False
         )
         end = time.time()
         search_res = set(x.id for x in res)
