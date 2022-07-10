@@ -7,7 +7,7 @@ import h5py
 import httpx
 from qdrant_client import QdrantClient
 
-from benchmark.config import DATA_DIR
+from benchmark.config import DATA_DIR, QDRANT_HOST, QDRANT_PORT, QDRANT_GRPC_PORT
 
 
 class Querier:
@@ -18,25 +18,28 @@ class Querier:
     def init_client(cls, collection_name="benchmark_collection"):
         cls.collection_name = collection_name
         cls.client = QdrantClient(
-            prefer_grpc=True,
+            host=QDRANT_HOST,
+            port=QDRANT_PORT,
+            grpc_port=QDRANT_GRPC_PORT,
+            prefer_grpc=False,
             limits=httpx.Limits(max_connections=None, max_keepalive_connections=0),
         )
 
     @classmethod
     def search_one(cls, params):
         neighbors, vector = params
-        top = 10
-        true_result = set(neighbors[:top])
+        limit = 10
+        true_result = set(neighbors[:limit])
         start = time.monotonic()
         res = cls.client.search(
             collection_name=cls.collection_name,
             query_vector=vector,
-            top=top,
+            limit=limit,
             with_payload=False
         )
         end = time.monotonic()
         search_res = set(x.id for x in res)
-        precision = len(search_res.intersection(true_result)) / top
+        precision = len(search_res.intersection(true_result)) / limit
         return precision, end - start
 
 
@@ -52,18 +55,18 @@ class BenchmarkSearch:
         self.vector_size = len(self.data['test'][0])
 
     def search_one(self, i):
-        top = 10
-        true_result = set(self.data['neighbors'][i][:top])
+        limit = 10
+        true_result = set(self.data['neighbors'][i][:limit])
         start = time.time()
         res = self.client.search(
             self.collection_name,
             query_vector=self.data['test'][i],
-            top=top,
+            limit=limit,
             with_payload=False
         )
         end = time.time()
         search_res = set(x.id for x in res)
-        precision = len(search_res.intersection(true_result)) / top
+        precision = len(search_res.intersection(true_result)) / limit
         return precision, end - start
 
     def search_all(self, parallel_queries=4):

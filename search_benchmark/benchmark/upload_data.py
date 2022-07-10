@@ -2,10 +2,11 @@ import os
 import time
 
 import h5py
+import httpx
 from qdrant_client import QdrantClient
 from qdrant_client.http.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection
 
-from benchmark.config import DATA_DIR
+from benchmark.config import DATA_DIR, QDRANT_HOST, QDRANT_PORT, QDRANT_GRPC_PORT
 
 
 class Benchmark:
@@ -13,7 +14,13 @@ class Benchmark:
     def __init__(self, data, collection_name="benchmark_collection"):
         self.collection_name = collection_name
         self.data = data
-        self.client = QdrantClient(prefer_grpc=True)
+        self.client = QdrantClient(
+            host=QDRANT_HOST,
+            port=QDRANT_PORT,
+            grpc_port=QDRANT_GRPC_PORT,
+            prefer_grpc=True,
+            limits=httpx.Limits(max_connections=None, max_keepalive_connections=0),
+        )
         self.vector_size = len(self.data['train'][0])
 
     def upload_data(self, parallel=4):
@@ -25,7 +32,6 @@ class Benchmark:
                 flush_interval_sec=10,
                 indexing_threshold=10000000,  # For better speed: Disable indexing before all points are added
                 memmap_threshold=1000000000,
-                payload_indexing_threshold=1000000000,
             )
         )
 
@@ -40,11 +46,11 @@ class Benchmark:
     def wait_collection_green(self):
         wait_time = 1.0
         total = 0
-        collection_info = self.client.openapi_client.collections_api.get_collection(self.collection_name)
-        while collection_info.result.status != CollectionStatus.GREEN:
+        collection_info = self.client.get_collection(self.collection_name)
+        while collection_info.status != CollectionStatus.GREEN:
             time.sleep(wait_time)
             total += wait_time
-            collection_info = self.client.openapi_client.collections_api.get_collection(self.collection_name)
+            collection_info = self.client.get_collection(self.collection_name)
         return total
 
     def enable_indexing(self):
