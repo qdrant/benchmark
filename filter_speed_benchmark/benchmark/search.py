@@ -1,12 +1,13 @@
+import json
 import os
 import time
-import json
 from concurrent import futures
-import httpx
 
+import httpx
 from qdrant_client import QdrantClient
-from qdrant_openapi_client.models.models import FieldCondition, Filter, Match
 from qdrant_client.http.models import MatchValue
+from qdrant_openapi_client.models.models import FieldCondition, Filter
+
 from benchmark.config import DATA_DIR
 
 

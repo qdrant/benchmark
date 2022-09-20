@@ -4,7 +4,8 @@ import time
 import h5py
 import httpx
 from qdrant_client import QdrantClient
-from qdrant_client.http.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection
+from qdrant_client.http.models.models import Distance, CollectionStatus, OptimizersConfigDiff, UpdateCollection, \
+    VectorParams
 
 from benchmark.config import DATA_DIR, QDRANT_HOST, QDRANT_PORT, QDRANT_GRPC_PORT
 
@@ -26,8 +27,10 @@ class Benchmark:
     def upload_data(self, parallel=4):
         self.client.recreate_collection(
             collection_name=self.collection_name,
-            vector_size=self.vector_size,
-            distance=Distance.COSINE,
+            vectors_config=VectorParams(
+                size=self.vector_size,
+                distance=Distance.COSINE,
+            ),
             optimizers_config=OptimizersConfigDiff(
                 flush_interval_sec=10,
                 indexing_threshold=10000000,  # For better speed: Disable indexing before all points are added
